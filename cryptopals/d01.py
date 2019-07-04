@@ -1,3 +1,5 @@
+from collections import defaultdict
+from math import sqrt
 import array
 from typing import *
 from string import ascii_uppercase, ascii_lowercase, digits
@@ -70,3 +72,68 @@ def test_fixed_xor():
     Y = '686974207468652062756c6c277320657965'
     Z = bytes.fromhex('746865206b696420646f6e277420706c6179')
     assert fixed_xor(X, Y) == Z
+
+
+LETTER_FREQ = defaultdict(int)
+LETTER_FREQ.update({ 
+  ord('e'): 12.02,
+  ord('t'): 9.10,
+  ord('a'): 8.12,
+  ord('o'): 7.68,
+  ord('i'): 7.31,
+  ord('n'): 6.95,
+  ord('s'): 6.28,
+  ord('r'): 6.02,
+  ord('h'): 5.92,
+  ord('d'): 4.32,
+  ord('l'): 3.98,
+  ord('u'): 2.88,
+  ord('c'): 2.71,
+  ord('m'): 2.61,
+  ord('f'): 2.30,
+  ord('y'): 2.11,
+  ord('w'): 2.09,
+  ord('g'): 2.03,
+  ord('p'): 1.82,
+  ord('b'): 1.49,
+  ord('v'): 1.11,
+  ord('k'): 0.69,
+  ord('x'): 0.17,
+  ord('q'): 0.11,
+  ord('j'): 0.10,
+  ord('z'): 0.07,
+})
+
+
+def find_single_byte_xor_cipher():
+    cipher = bytes.fromhex('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736')
+    lowest = float('inf')
+    for i in range(256):
+        key = array.array('B', [i for _ in cipher]).tobytes()
+        M = fixed_xor(cipher, key)
+        freq = letter_frequencies(M)
+        S = score(freq, LETTER_FREQ)
+        print(i, round(S, 3))
+        #input()
+        lowest = min(lowest, S)
+
+    print('lowest', lowest)
+
+
+def letter_frequencies(s):
+    counts = defaultdict(int) 
+    counts.update({
+      c: 100 * (n / len(s))
+      for c, n in Counter(s).items()
+    })
+    return counts
+
+# MSE
+def score(freq, expected_freq):
+    all_keys = (set(expected_freq.keys()) | set(freq.keys()))
+    return sqrt(sum(
+      (expected_freq[c] - freq[c])**2
+      for c in all_keys
+    )) / len(expected_freq)
+
+find_single_byte_xor_cipher()
