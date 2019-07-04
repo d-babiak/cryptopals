@@ -105,35 +105,29 @@ LETTER_FREQ.update({
 })
 
 
+with open('/usr/share/dict/words') as fp:
+    ENGLISH = {s.strip().lower() for s in fp}
+
 def find_single_byte_xor_cipher():
     cipher = bytes.fromhex('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736')
-    lowest = float('inf')
+    highest = float('-inf')
+    argmax  = None
     for i in range(256):
-        key = array.array('B', [i for _ in cipher]).tobytes()
-        M = fixed_xor(cipher, key)
-        freq = letter_frequencies(M)
-        S = score(freq, LETTER_FREQ)
-        print(i, round(S, 3))
-        #input()
-        lowest = min(lowest, S)
+        try:
+            key = array.array('B', [i for _ in cipher]).tobytes()
+            M = fixed_xor(cipher, key)
+            S = sum(
+              x.decode('utf-8') in ENGLISH
+              for x in M.split(b' ')
+            )
+            if S > highest:
+                highest = S
+                argmax  = M
+        except UnicodeDecodeError:
+            continue
 
-    print('lowest', lowest)
+    print('   max', highest)
+    print('argmax', argmax)
 
-
-def letter_frequencies(s):
-    counts = defaultdict(int) 
-    counts.update({
-      c: 100 * (n / len(s))
-      for c, n in Counter(s).items()
-    })
-    return counts
-
-# MSE
-def score(freq, expected_freq):
-    all_keys = (set(expected_freq.keys()) | set(freq.keys()))
-    return sqrt(sum(
-      (expected_freq[c] - freq[c])**2
-      for c in all_keys
-    )) / len(expected_freq)
 
 find_single_byte_xor_cipher()
