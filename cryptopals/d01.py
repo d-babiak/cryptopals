@@ -108,8 +108,7 @@ LETTER_FREQ.update({
 with open('/usr/share/dict/words') as fp:
     ENGLISH = {s.strip().lower() for s in fp}
 
-def find_single_byte_xor_cipher():
-    cipher = bytes.fromhex('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736')
+def argmax_single_byte_xor_cipher(cipher):
     highest = float('-inf')
     argmax  = None
     for i in range(256):
@@ -126,8 +125,20 @@ def find_single_byte_xor_cipher():
         except UnicodeDecodeError:
             continue
 
-    print('   max', highest)
-    print('argmax', argmax)
+    return highest, argmax or ''
 
 
-find_single_byte_xor_cipher()
+def p4():
+    with open('./data/single_byte_xor.input') as fp:
+        buffers = tuple(bytes.fromhex(s.strip()) for s in fp)
+
+    X = {
+      buf: argmax_single_byte_xor_cipher(buf)
+      for buf in buffers
+    }
+
+    buf, (N, msg) = max(
+      list(X.items()), 
+      key=lambda x: x[1][0]
+    )
+    print(buf, msg, N)
