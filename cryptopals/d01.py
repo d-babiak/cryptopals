@@ -1,8 +1,8 @@
-from collections import defaultdict
-from math import sqrt
-import array
-from typing import *
+import binascii
+from itertools import cycle
 from string import ascii_uppercase, ascii_lowercase, digits
+from typing import *
+import array
 
 s_hex = bytes.fromhex('49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d')
 s_b64 = b'SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t'
@@ -111,3 +111,24 @@ def p4():
       key=lambda x: x[1][0]
     )
     print(buf, msg, N)
+
+
+def repeating_key_xor(m, key):
+    m   =   m.encode('utf-8') if isinstance(  m, str) else   m
+    key = key.encode('utf-8') if isinstance(key, str) else key
+
+    xord = [x ^ y for x, y in zip(m, cycle(key))]
+
+    buf = array.array('B', xord)
+    return buf.tobytes()
+
+def test_repeating_key_xor():
+    s1 = \
+     b"Burning 'em, if you ain't quick and nimble\n" \
+     b"I go crazy when I hear a cymbal"
+
+    actual = binascii.hexlify(repeating_key_xor(s1, b'ICE'))
+
+    expected = b'0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f'
+
+    assert actual == expected
