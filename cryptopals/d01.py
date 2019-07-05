@@ -113,14 +113,9 @@ def p4():
     print(buf, msg, N)
 
 
-def repeating_key_xor(m, key):
-    m   =   m.encode('utf-8') if isinstance(  m, str) else   m
-    key = key.encode('utf-8') if isinstance(key, str) else key
-
-    xord = [x ^ y for x, y in zip(m, cycle(key))]
-
-    buf = array.array('B', xord)
-    return buf.tobytes()
+def repeating_key_xor(m: bytes, key: bytes) -> bytes:
+    buf = (x ^ y for x, y in zip(m, cycle(key)))
+    return array.array('B', buf).tobytes()
 
 def test_repeating_key_xor():
     s1 = \
