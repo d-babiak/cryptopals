@@ -74,37 +74,6 @@ def test_fixed_xor():
     assert fixed_xor(X, Y) == Z
 
 
-LETTER_FREQ = defaultdict(int)
-LETTER_FREQ.update({ 
-  ord('e'): 12.02,
-  ord('t'): 9.10,
-  ord('a'): 8.12,
-  ord('o'): 7.68,
-  ord('i'): 7.31,
-  ord('n'): 6.95,
-  ord('s'): 6.28,
-  ord('r'): 6.02,
-  ord('h'): 5.92,
-  ord('d'): 4.32,
-  ord('l'): 3.98,
-  ord('u'): 2.88,
-  ord('c'): 2.71,
-  ord('m'): 2.61,
-  ord('f'): 2.30,
-  ord('y'): 2.11,
-  ord('w'): 2.09,
-  ord('g'): 2.03,
-  ord('p'): 1.82,
-  ord('b'): 1.49,
-  ord('v'): 1.11,
-  ord('k'): 0.69,
-  ord('x'): 0.17,
-  ord('q'): 0.11,
-  ord('j'): 0.10,
-  ord('z'): 0.07,
-})
-
-
 with open('/usr/share/dict/words') as fp:
     ENGLISH = {s.strip().lower() for s in fp}
 
